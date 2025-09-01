@@ -16,9 +16,9 @@ This is a local knowledge base question-answering system based on Retrieval-Augm
 
 The system provides an intuitive web interface that consolidates all core functionalities.
 
-![alt text](D:\LLms\Tiny-RAG\assets\1.png)
+![alt text](assets\1.png)
 
-![alt text](D:\LLms\Tiny-RAG\assets\2.png)
+![alt text](assets\2.png)
 
 **Main Dialogue Interface:** Users can upload documents, ask questions, and receive LLM-generated answers here.
 
