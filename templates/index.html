@@ -1,0 +1,1112 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG智能问答系统 - 增强版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1400px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            height: 700px;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 配置面板样式 */
+        .config-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .config-panel h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 1.1em;
+        }
+
+        .config-item {
+            margin-bottom: 15px;
+        }
+
+        .config-item label {
+            display: block;
+            margin-bottom: 5px;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .config-item select,
+        .config-item input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        .config-item input[type="range"] {
+            padding: 0;
+        }
+
+        .range-value {
+            display: inline-block;
+            margin-left: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* 文档管理样式 */
+        .document-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .document-item {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .document-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-name {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .document-meta {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.85em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        /* 公共按钮样式 */
+        .action-button {
+            padding: 10px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        /* 主要按钮（蓝色风格） */
+        .action-button.primary {
+            background: linear-gradient(135deg, #4dabf7, #228be6);
+            color: #fff;
+        }
+
+        .action-button.primary:hover {
+            background: linear-gradient(135deg, #339af0, #1c7ed6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* 危险按钮（红色风格） */
+        .action-button.danger {
+            background: linear-gradient(135deg, #fa5252, #e03131);
+            color: #fff;
+        }
+
+        .action-button.danger:hover {
+            background: linear-gradient(135deg, #f03e3e, #c92a2a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* 点击时回弹 */
+        .action-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+
+        /* 消息样式 */
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.assistant .message-content {
+            background: #f1f3f5;
+            color: #333;
+        }
+
+        /* 来源卡片样式 */
+        .sources-container {
+            margin-top: 15px;
+        }
+
+        .source-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .source-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .source-title {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .source-scores {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .score-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+
+        .score-badge.high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .source-text {
+            color: #6c757d;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .source-meta {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+
+        /* 性能指标样式 */
+        .performance-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        .performance-item {
+            display: inline-block;
+            margin-right: 15px;
+            color: #6c757d;
+        }
+
+        .performance-value {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        /* 输入区域 */
+        .input-area {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .input-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 输入框样式 */
+        #questionInput {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #ced4da;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fff;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        #questionInput:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 6px rgba(77, 171, 247, 0.4);
+        }
+
+        /* 发送按钮样式 */
+        #sendButton {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #4dabf7, #228be6);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        #sendButton:hover {
+            background: linear-gradient(135deg, #339af0, #1c7ed6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        #sendButton:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        /* 统计面板 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* 加载和动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 RAG智能问答系统 </h1>
+            <p>支持多种检索策略的智能文档问答助手</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <!-- 检索器配置 -->
+                <div class="config-panel">
+                    <h3>检索器配置</h3>
+                    <div class="config-item">
+                        <label>检索器类型</label>
+                        <select id="retrieverType" onchange="updateRetrieverConfig()">
+                            <option value="vector">向量检索</option>
+                            <option value="hybrid">混合检索</option>
+                            <option value="ensemble">集成检索</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>相似度阈值</label>
+                        <input type="range" id="similarityThreshold" min="0" max="1" step="0.1" value="0.5">
+                        <span class="range-value" id="thresholdValue">0.5</span>
+                    </div>
+                    <div class="config-item" id="keywordWeightItem" style="display:none;">
+                        <label>关键词权重</label>
+                        <input type="range" id="keywordWeight" min="0" max="1" step="0.1" value="0.3">
+                        <span class="range-value" id="weightValue">0.3</span>
+                    </div>
+                    <div class="config-item">
+                        <label>返回结果数</label>
+                        <input type="number" id="topK" min="1" max="10" value="3">
+                    </div>
+                    <button class="action-button primary" onclick="applyRetrieverConfig()">
+                        应用配置
+                    </button>
+                </div>
+
+                <!-- 文档管理 -->
+                <div class="upload-section">
+                    <h3>文档管理</h3>
+                    <div class="upload-area" id="uploadArea">
+                        <p>👆 点击或拖拽上传文档</p>
+                        <p style="font-size: 0.9em; color: #6c757d; margin-top: 10px;">
+                            支持 PDF, TXT,
+                        </p>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.txt,.docx,.md" style="display: none;">
+                    </div>
+                    <div class="config-item" style="margin-top: 10px;">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="preprocessCheck" checked>
+                            <label for="preprocessCheck">预处理文档</label>
+                        </div>
+                    </div>
+                    <div class="document-list" id="documentList"></div>
+                </div>
+
+                <!-- 统计信息 -->
+                <div class="stats-section">
+                    <h3>系统状态</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="docCount">0</div>
+                            <div class="stat-label">文档数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="chunkCount">0</div>
+                            <div class="stat-label">文本块</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="cacheCount">0</div>
+                            <div class="stat-label">缓存数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="avgTime">0</div>
+                            <div class="stat-label">平均响应(秒)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button class="action-button primary" onclick="exportKnowledgeBase()">
+                        导出知识库
+                    </button>
+                    <button class="action-button primary" onclick="runEvaluation()">
+                        运行评估
+                    </button>
+                    <button class="action-button danger" onclick="clearKnowledgeBase()">
+                        清空知识库
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-area">
+                <div class="messages" id="messagesContainer">
+                    <div class="message assistant">
+                        <div class="message-content">
+                            👋 您好！我是增强版RAG智能助手。请上传文档后向我提问，我会基于文档内容为您解答。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <div class="input-controls">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="showSourcesCheck" checked>
+                            <label for="showSourcesCheck">显示来源</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="showPerformanceCheck">
+                            <label for="showPerformanceCheck">显示性能</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="debugModeCheck">
+                            <label for="debugModeCheck">调试模式</label>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="questionInput" placeholder="请输入您的问题..."
+                               onkeypress="handleKeyPress(event)">
+                        <button id="sendButton" onclick="sendQuestion()">发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = generateUUID();
+        let isProcessing = false;
+        let currentConfig = {};
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // 初始化
+        async function init() {
+            await loadConfig();
+            await updateStats();
+            await loadDocuments();
+
+            // 设置事件监听
+            setupEventListeners();
+
+            // 定时更新统计
+            setInterval(updateStats, 30000);
+        }
+
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const data = await response.json();
+
+                if (data.success) {
+                    currentConfig = data.config;
+                    updateUIFromConfig();
+                }
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        }
+
+        // 更新UI配置
+        function updateUIFromConfig() {
+            if (currentConfig.current_retriever.includes('Hybrid')) {
+                document.getElementById('retrieverType').value = 'hybrid';
+                document.getElementById('keywordWeightItem').style.display = 'block';
+            } else if (currentConfig.current_retriever.includes('Ensemble')) {
+                document.getElementById('retrieverType').value = 'ensemble';
+            } else {
+                document.getElementById('retrieverType').value = 'vector';
+            }
+
+            document.getElementById('similarityThreshold').value = currentConfig.similarity_threshold || 0.5;
+            document.getElementById('thresholdValue').textContent = currentConfig.similarity_threshold || 0.5;
+            document.getElementById('topK').value = currentConfig.top_k || 3;
+        }
+
+        // 设置事件监听
+        function setupEventListeners() {
+            // 文件上传
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+
+            // 滑块事件
+            document.getElementById('similarityThreshold').addEventListener('input', (e) => {
+                document.getElementById('thresholdValue').textContent = e.target.value;
+            });
+
+            document.getElementById('keywordWeight').addEventListener('input', (e) => {
+                document.getElementById('weightValue').textContent = e.target.value;
+            });
+        }
+
+        // 更新检索器配置UI
+        function updateRetrieverConfig() {
+            const type = document.getElementById('retrieverType').value;
+            const keywordWeightItem = document.getElementById('keywordWeightItem');
+
+            if (type === 'hybrid') {
+                keywordWeightItem.style.display = 'block';
+            } else {
+                keywordWeightItem.style.display = 'none';
+            }
+        }
+
+        // 应用检索器配置
+        async function applyRetrieverConfig() {
+            const config = {
+                type: document.getElementById('retrieverType').value,
+                params: {
+                    similarity_threshold: parseFloat(document.getElementById('similarityThreshold').value),
+                    top_k: parseInt(document.getElementById('topK').value)
+                }
+            };
+
+            if (config.type === 'hybrid') {
+                config.params.keyword_weight = parseFloat(document.getElementById('keywordWeight').value);
+            }
+
+            try {
+                const response = await fetch('/api/config/retriever', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('assistant', `检索器已更新为: ${config.type}`);
+                } else {
+                    showMessage('assistant', `配置失败: ${data.error}`);
+                }
+            } catch (error) {
+                showMessage('assistant', `配置出错: ${error.message}`);
+            }
+        }
+
+        // 处理文件上传
+        async function handleFiles(files) {
+            const formData = new FormData();
+            const preprocess = document.getElementById('preprocessCheck').checked;
+
+            for (let file of files) {
+                formData.append('file', file);
+            }
+            formData.append('preprocess', preprocess);
+
+            try {
+                showMessage('assistant', '正在上传和处理文档...');
+
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('assistant',
+                        `成功上传 ${data.files.length} 个文件\n` +
+                        `处理时间: ${data.process_time?.toFixed(2)}秒\n` +
+                        `生成文本块: ${data.total_chunks}个`
+                    );
+
+                    await loadDocuments();
+                    await updateStats();
+                } else {
+                    showMessage('assistant', `上传失败: ${data.error}`);
+                }
+            } catch (error) {
+                showMessage('assistant', `上传出错: ${error.message}`);
+            }
+        }
+
+        // 加载文档列表
+        async function loadDocuments() {
+            try {
+                const response = await fetch('/api/documents');
+                const data = await response.json();
+
+                if (data.success) {
+                    const documentList = document.getElementById('documentList');
+                    documentList.innerHTML = '';
+
+                    data.documents.forEach(doc => {
+                        const docItem = document.createElement('div');
+                        docItem.className = 'document-item';
+                        docItem.innerHTML = `
+                            <div class="document-info">
+                                <div class="document-name">📄 ${doc.filename}</div>
+                                <div class="document-meta">
+                                    ${doc.chunk_count || 0} 个片段 |
+                                    ${doc.preprocessed ? '已预处理' : '原始文本'}
+                                </div>
+                            </div>
+                            <div class="document-actions">
+                                <button class="btn-small btn-delete" onclick="deleteDocument('${doc.file_id}')">
+                                    删除
+                                </button>
+                            </div>
+                        `;
+                        documentList.appendChild(docItem);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load documents:', error);
+            }
+        }
+
+        // 删除文档
+        async function deleteDocument(fileId) {
+            if (!confirm('确定要删除这个文档吗？')) return;
+
+            try {
+                const response = await fetch(`/api/documents/${fileId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await loadDocuments();
+                    await updateStats();
+                    showMessage('assistant', '文档已删除');
+                } else {
+                    showMessage('assistant', `删除失败: ${data.error}`);
+                }
+            } catch (error) {
+                showMessage('assistant', `删除出错: ${error.message}`);
+            }
+        }
+
+        // 发送问题
+        async function sendQuestion() {
+            const input = document.getElementById('questionInput');
+            const question = input.value.trim();
+
+            if (!question || isProcessing) return;
+
+            isProcessing = true;
+            document.getElementById('sendButton').disabled = true;
+
+            // 显示用户消息
+            showMessage('user', question);
+            input.value = '';
+
+            // 显示加载状态
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        question: question,
+                        session_id: sessionId,
+                        use_history: true,
+                        return_debug: document.getElementById('debugModeCheck').checked
+                    })
+                });
+
+                const data = await response.json();
+
+                hideTypingIndicator();
+
+                if (data.success) {
+                    // 显示答案
+                    let messageContent = data.answer;
+
+                    // 添加性能信息
+                    if (document.getElementById('showPerformanceCheck').checked && data.performance) {
+                        messageContent += `
+                            <div class="performance-info">
+                                <span class="performance-item">
+                                    总耗时: <span class="performance-value">${data.performance.total_time}s</span>
+                                </span>
+                                <span class="performance-item">
+                                    检索: <span class="performance-value">${data.performance.retrieval_time}s</span>
+                                </span>
+                                <span class="performance-item">
+                                    生成: <span class="performance-value">${data.performance.generation_time}s</span>
+                                </span>
+                            </div>
+                        `;
+                    }
+
+                    showMessage('assistant', messageContent);
+
+                    // 显示来源
+                    if (document.getElementById('showSourcesCheck').checked && data.sources?.length > 0) {
+                        showSources(data.sources);
+                    }
+
+                    // 显示调试信息
+                    if (data.debug) {
+                        console.log('Debug info:', data.debug);
+                    }
+                } else {
+                    showMessage('assistant', `查询失败: ${data.error}`);
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                showMessage('assistant', `查询出错: ${error.message}`);
+            } finally {
+                isProcessing = false;
+                document.getElementById('sendButton').disabled = false;
+            }
+        }
+
+        // 显示来源
+        function showSources(sources) {
+            const messagesContainer = document.getElementById('messagesContainer');
+
+            const sourcesDiv = document.createElement('div');
+            sourcesDiv.className = 'sources-container';
+            sourcesDiv.innerHTML = '<strong>参考来源：</strong>';
+
+            sources.forEach((source, index) => {
+                const scoreClass = source.similarity > 0.7 ? 'high' : '';
+
+                const sourceCard = document.createElement('div');
+                sourceCard.className = 'source-card';
+                sourceCard.innerHTML = `
+                    <div class="source-header">
+                        <span class="source-title">来源 ${index + 1}</span>
+                        <div class="source-scores">
+                            <span class="score-badge ${scoreClass}">
+                                相似度: ${(source.similarity * 100).toFixed(1)}%
+                            </span>
+                            ${source.hybrid_score ? `
+                                <span class="score-badge">
+                                    混合: ${(source.hybrid_score * 100).toFixed(1)}%
+                                </span>
+                            ` : ''}
+                            ${source.keyword_score ? `
+                                <span class="score-badge">
+                                    关键词: ${(source.keyword_score * 100).toFixed(1)}%
+                                </span>
+                            ` : ''}
+                            <span class="score-badge">
+                                ${source.retriever_type}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="source-text">${source.text}</div>
+                    ${source.metadata ? `
+                        <div class="source-meta">
+                            ${source.metadata.source || ''}
+                            ${source.metadata.chunk_id !== undefined ? `| 片段 ${source.metadata.chunk_id + 1}` : ''}
+                        </div>
+                    ` : ''}
+                `;
+
+                sourcesDiv.appendChild(sourceCard);
+            });
+
+            messagesContainer.appendChild(sourcesDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 显示消息
+        function showMessage(role, content) {
+            const messagesContainer = document.getElementById('messagesContainer');
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 显示输入指示器
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('messagesContainer');
+
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'message assistant';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 隐藏输入指示器
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        // 处理键盘事件
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendQuestion();
+            }
+        }
+
+        // 更新统计
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('docCount').textContent =
+                        data.stats.document_count || 0;
+                    document.getElementById('chunkCount').textContent =
+                        data.stats.total_documents || 0;
+                    document.getElementById('cacheCount').textContent =
+                        data.stats.cache_files || 0;
+
+                    if (data.stats.avg_query_time) {
+                        document.getElementById('avgTime').textContent =
+                            data.stats.avg_query_time.toFixed(2);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to update stats:', error);
+            }
+        }
+
+        // 运行评估
+        async function runEvaluation() {
+            const testQueries = [
+                {
+                    question: "测试问题1",
+                    expected_docs: ["doc_001"]
+                },
+                {
+                    question: "测试问题2",
+                    expected_docs: ["doc_002"]
+                }
+            ];
+
+            try {
+                showMessage('assistant', '正在运行评估...');
+
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({test_queries: testQueries})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let resultText = '评估结果：\n';
+                    for (const [key, value] of Object.entries(data.metrics)) {
+                        resultText += `${key}: ${value.toFixed(3)}\n`;
+                    }
+                    showMessage('assistant', resultText);
+                } else {
+                    showMessage('assistant', `评估失败: ${data.error}`);
+                }
+            } catch (error) {
+                showMessage('assistant', `评估出错: ${error.message}`);
+            }
+        }
+
+        // 导出知识库
+        async function exportKnowledgeBase() {
+            try {
+                showMessage('assistant', '正在导出知识库...');
+
+                const response = await fetch('/api/export');
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `rag_export_${new Date().getTime()}.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+
+                    showMessage('assistant', '知识库导出成功');
+                } else {
+                    showMessage('assistant', '导出失败');
+                }
+            } catch (error) {
+                showMessage('assistant', `导出出错: ${error.message}`);
+            }
+        }
+
+        // 清空知识库
+        async function clearKnowledgeBase() {
+            if (!confirm('确定要清空所有文档吗？此操作不可恢复。')) return;
+
+            try {
+                const response = await fetch('/api/clear', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('documentList').innerHTML = '';
+                    await updateStats();
+                    showMessage('assistant', '知识库已清空');
+                } else {
+                    showMessage('assistant', `清空失败: ${data.error}`);
+                }
+            } catch (error) {
+                showMessage('assistant', `操作出错: ${error.message}`);
+            }
+        }
+
+        // 初始化系统
+        init();
+    </script>
+</body>
+</html>

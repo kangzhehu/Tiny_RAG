@@ -1,0 +1,46 @@
+# 模型
+embedding:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  dimension: 384
+  cache_dir: "./cache/embeddings"
+  use_cache: true
+  batch_size: 32
+llm:
+  model_name: "google/gemma-2-2b-it"
+  max_new_tokens: 1000
+  temperature: 0.7
+reranker:
+  model_name: "BAAI/bge-reranker-base"
+
+
+# 切分
+text_splitter:
+  chunk_size: 500
+  chunk_overlap: 50
+  separators: ["\n\n", "\n", "。", ".", "！", "？", "；", " "]
+
+vector_store:
+  type: "faiss"
+  index_type: "Flat"  # Flat or VIF
+  index_path: "../data/vector_db/index"
+
+# 检索
+retriever:
+  type: "hybrid"  # 可选: "vector", "hybrid", "ensemble"
+  top_k: 3
+  similarity_threshold: 0.2 # 相似度阈值
+  keyword_weight: 0.3
+
+
+# 服务器配置
+server:
+  host: "0.0.0.0"
+  port: 5000
+  debug: true
+  max_upload_size: 16777216  # 16MB
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/app.log"

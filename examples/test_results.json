@@ -1,0 +1,58 @@
+{
+  "retrievers_comparison": {
+    "向量检索器": {
+      "num_results": 3,
+      "retrieval_time": 14.24241828918457,
+      "top_similarity": 0.41741860927075863
+    },
+    "混合检索器": {
+      "num_results": 3,
+      "retrieval_time": 11.867957592010498,
+      "top_similarity": 0.4124935779975311
+    },
+    "集成检索器": {
+      "num_results": 3,
+      "retrieval_time": 13.537384510040283,
+      "top_similarity": 0.41741860927075863
+    }
+  },
+  "batch_query_results": [
+    {
+      "question": "什么是机器学习？",
+      "answer_preview": "The answer is: **机器学习是人工智能领域的重要技术。** \n\nThe document repeats this statement multiple times, emphasizi...",
+      "num_sources": 3,
+      "query_time": 5.2545342445373535
+    },
+    {
+      "question": "深度学习的应用有哪些？",
+      "answer_preview": "The provided text focuses on RAGRetrievalAugmented Generation, a technology that combines informatio...",
+      "num_sources": 3,
+      "query_time": 11.121498346328735
+    },
+    {
+      "question": "自然语言处理的挑战是什么？",
+      "answer_preview": "The provided text does not explicitly state the challenges of Natural Language Processing (NLP). How...",
+      "num_sources": 3,
+      "query_time": 13.041245222091675
+    },
+    {
+      "question": "计算机视觉如何工作？",
+      "answer_preview": "The provided text is about RAGRetrievalAugmented Generation, a method that combines information retr...",
+      "num_sources": 3,
+      "query_time": 19.118619203567505
+    }
+  ],
+  "retrieval_metrics": {
+    "avg_precision": 1.0,
+    "avg_recall": 1.0,
+    "avg_f1": 1.0,
+    "avg_mrr": 1.0,
+    "num_queries": 2
+  },
+  "performance_stats": {
+    "query_count": 3,
+    "avg_query_time": 13.215920130411783,
+    "avg_retrieval_time": 13.215920130411783,
+    "avg_generation_time": 0.0
+  }
+}
