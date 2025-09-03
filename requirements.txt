@@ -10,7 +10,7 @@ transformers==4.35.0
 torch>=2.0.0
 
 # 向量数据库
-faiss-cpu==1.7.4  # 或者 faiss-gpu 如果有GPU
+faiss-cpu  # 或者 faiss-gpu 如果有GPU
 
 # 文档处理
 PyPDF2==3.0.1
